@@ -7,21 +7,57 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- * CacmReader : lit un fichier cacm et renvoie une liste de documents
+ * CacmDatabase : représente une base de données CACM complète. Une CacmDatabase se construit à partir d'un fichier
+ * CACM qui est parsé.
  */
-public class CacmReader
+public class CacmDatabase
 {
     private ArrayList<String> stopList;
+    private ArrayList<Document> documents;
 
-    public CacmReader()
+    /**
+     * Construct a CacmDatabase from a CACM text file.
+     *
+     * @param cacmFileName Path to the CACM file.
+     * @param stopListFileName (optional) Path to a file containing stopwords, one per line.
+     *
+     * @throws IOException if the CACM database could not be opened. No exception is thrown for the stop-list.
+     */
+    public CacmDatabase(String cacmFileName, String stopListFileName) throws IOException
     {
+        // Load stop list (if provided)
         stopList = new ArrayList<String>();
+        if (stopListFileName != null) {
+            try {
+                loadStopList(stopListFileName);
+            }
+            catch (IOException e) {}
+        }
+
+        // Load documents
+        parseFile(cacmFileName);
+    }
+
+    /**
+     * Return the stop-list used for this database
+     * @return an ArrayList of the stop-list's words
+     */
+    public ArrayList<String> getStopList() {
+        return stopList;
+    }
+
+    /**
+     * Return the documents of the database
+     * @return an ArrayList of the documents
+     */
+    public ArrayList<Document> getDocuments() {
+        return documents;
     }
 
     /**
      * Charge la stopList depuis un fichier dont le nom est passé en paramètre.
      */
-    public void loadStopList(String stopListFile) throws IOException
+    private void loadStopList(String stopListFile) throws IOException
     {
         BufferedReader br = new BufferedReader(new FileReader(stopListFile));
         String currentLine = "";
@@ -33,13 +69,13 @@ public class CacmReader
     /**
      * Parse un fichier CACM et renvoie la liste de documents correspondante
      */
-    public ArrayList<Document> parseFile(String cacmFileName) throws IOException
+    private void parseFile(String cacmFileName) throws IOException
     {
-        BufferedReader br = new BufferedReader(new FileReader(cacmFileName));
+        documents = new ArrayList<Document>();
 
+        BufferedReader br = new BufferedReader(new FileReader(cacmFileName));
         String currentLine = "";
         Document currentDoc = null;
-        ArrayList<Document> documents = new ArrayList<Document>();
         boolean reading = false;
 
         while ((currentLine = br.readLine()) != null) {
@@ -68,15 +104,13 @@ public class CacmReader
         }
 
         if (currentDoc != null) documents.add(currentDoc);
-
-        return documents;
     }
 
     /**
      * Extrait les tokens ("mots") d'une ligne en supprimant la ponctuation et les majuscules. Supprime aussi les mots
      * de la stop list.
      */
-    public ArrayList<String> tokenizeAndFilter(String input)
+    private ArrayList<String> tokenizeAndFilter(String input)
     {
         input = input.trim().toLowerCase()
                 .replaceAll("[^a-z]", " ")  // remplacer tout ce qui n'est pas une lettre par un espace
@@ -90,9 +124,5 @@ public class CacmReader
         }
 
         return words;
-    }
-
-    public ArrayList<String> getStopList() {
-        return stopList;
     }
 }
