@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Document : représente un document de la base CACM
+ * Represents a CACM document.
  */
 public class Document
 {
     private int id;
     private ArrayList<String> words;
 
+    /**
+     * Construct a document.
+     * @param id
+     * @param words
+     */
     public Document(int id, ArrayList<String> words)
     {
         this.id = id;
@@ -26,14 +31,26 @@ public class Document
         return words;
     }
 
+    /**
+     * Add a single word to the document
+     * @param word
+     */
     public void addWord(String word) {
         words.add(word);
     }
 
+    /**
+     * Add multiple words to the document
+     * @param newWords ArrayList of words to add
+     */
     public void addWords(ArrayList<String> newWords) {
         words.addAll(newWords);
     }
 
+    /**
+     * Get the word frequencies in the document.
+     * @return a HashMap of (word -> number of occurences)
+     */
     public HashMap<String, Integer> getWordFrequencies()
     {
         HashMap<String, Integer> map = new HashMap<String, Integer>();
