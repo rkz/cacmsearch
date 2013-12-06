@@ -6,28 +6,14 @@ import java.util.HashMap;
 /**
  * Vector of a document's weights. Each coordinate is the weight of a particular word in the document.
  */
-public class WordVector
+public class WordVector extends HashMap<String, Double>
 {
-    private HashMap<String, Double> coordinates;
-
     /**
-     * Initialize a WordVector with the given coordinates.
-     * @param coordinates coordinates of the vector (values) on the dimensions provided as keys. The coordinates on
-     *                    other dimensions are null.
+     * Get a vector's coordinate. Coordinates on axis not present in the vector's definition are zero.
      */
-    public WordVector(HashMap<String, Double> coordinates)
+    public Double get(String axis)
     {
-        this.coordinates = coordinates;
-    }
-
-    /**
-     * Get one coordinate
-     * @param axis the word to use as axis
-     * @return the vector's coordinate over the given axis, or zero if it has no such coordinate.
-     */
-    public double getCoordinate(String axis)
-    {
-        if (coordinates.containsKey(axis)) return coordinates.get(axis);
+        if (containsKey(axis)) return super.get(axis);
         else return 0.0;
     }
 
@@ -39,17 +25,17 @@ public class WordVector
     {
         double norm = getNorm();
 
-        HashMap<String, Double> normalizedCoordinates = new HashMap<String, Double>();
-        for (String word : coordinates.keySet())
-            normalizedCoordinates.put(word, coordinates.get(word) / norm);
+        WordVector normalized = new WordVector();
+        for (String word : keySet())
+            normalized.put(word, get(word) / norm);
 
-        return new WordVector(normalizedCoordinates);
+        return normalized;
     }
 
     public double getNorm()
     {
         double squareNorm = 0.0;
-        for (double x : coordinates.values())
+        for (double x : values())
             squareNorm += x*x;
 
         return Math.sqrt(squareNorm);
@@ -67,10 +53,21 @@ public class WordVector
 
         // No need to iterate over the two vector's axis, as the axis which are not present in both vectors will not
         // contribute to the scalar product
-        for (String word : v1.coordinates.keySet()) {
-            product += v1.getCoordinate(word) * v2.getCoordinate(word);
+        for (String word : v1.keySet()) {
+            product += v1.get(word) * v2.get(word);
         }
 
         return product;
+    }
+
+    /**
+     * Compute the cosine between two WordVector's.
+     * @param v1 first vector
+     * @param v2 second vector
+     * @return cos(v1, v2)
+     */
+    static public double cos(WordVector v1, WordVector v2)
+    {
+        return scalarProduct(v1.normalize(), v2.normalize());
     }
 }

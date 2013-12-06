@@ -10,19 +10,26 @@ public class Main
     {
         try {
             // Test scalar vectors
-            HashMap<String, Double> c1 = new HashMap<String, Double>();
-            c1.put("zak", 3.0);
-            c1.put("bar", 2.0);
+            WordVector c1 = new WordVector();
+            c1.put("foo", 3.0);
+            c1.put("car", 2.0);
             c1.put("wee", 1.5);
-            WordVector v1 = new WordVector(c1);
 
-            HashMap<String, Double> c2 = new HashMap<String, Double>();
+            WordVector c2 = new WordVector();
             c2.put("bar", 4.0);
             c2.put("wee", 2.0);
             c2.put("zak", 1.1);
-            WordVector v2 = new WordVector(c2);
 
-            System.out.println(String.format("%f", WordVector.scalarProduct(v1, v2)));
+            System.out.println(String.format("%f", WordVector.scalarProduct(c1, c2)));
+
+            WordVector n2 = c2.normalize();
+            for (String w : n2.keySet()) {
+                System.out.println(String.format("n2[%s] = %.4f", w, n2.get(w)));
+            }
+            System.out.println(String.format("||n2|| = %.4f", n2.getNorm()));
+
+            System.out.println(String.format("cos(c1, c2) = %.4f", WordVector.cos(c1, c2)));
+
             System.exit(0);
 
             Date begin = new Date();
