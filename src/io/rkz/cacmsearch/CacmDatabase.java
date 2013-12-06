@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Represents a complete CACM data file.
@@ -132,5 +135,39 @@ public class CacmDatabase
         }
 
         return words;
+    }
+
+    /**
+     * Builds and returns the corresponding CacmIndex.
+     */
+    public CacmIndex getIndex()
+    {
+        HashMap<Integer, HashMap<String, Integer>> index = new HashMap<Integer, HashMap<String, Integer>>();
+        HashMap<String, HashMap<Integer, Integer>> reverseIndex =  new HashMap<String, HashMap<Integer, Integer>>();
+
+        for (Document d : documents) {
+            // Push the document's word frequencies to the index
+            HashMap<String, Integer> freq = d.getWordFrequencies();
+            index.put(d.getId(), d.getWordFrequencies());
+
+            // Add the words to the reverse index
+            for (String word : freq.keySet()) {
+                Integer frequency = freq.get(word);
+
+                // If necessary, add the word to the global index
+                if (!reverseIndex.containsKey(word))
+                    reverseIndex.put(word, new HashMap<Integer, Integer>());
+
+                // Update or insert the document's word frequency
+                HashMap<Integer, Integer> wordFrequencies = reverseIndex.get(word);
+                if (wordFrequencies.containsKey(d.getId()))
+                    wordFrequencies.put(d.getId(), wordFrequencies.get(d.getId()) + 1);
+                else
+                    wordFrequencies.put(d.getId(), 1);
+            }
+
+        }
+
+        return new CacmIndex(index, reverseIndex);
     }
 }
