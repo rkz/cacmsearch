@@ -9,6 +9,22 @@ public class Main
     public static void main(String[] args)
     {
         try {
+            // Test scalar vectors
+            HashMap<String, Double> c1 = new HashMap<String, Double>();
+            c1.put("zak", 3.0);
+            c1.put("bar", 2.0);
+            c1.put("wee", 1.5);
+            WordVector v1 = new WordVector(c1);
+
+            HashMap<String, Double> c2 = new HashMap<String, Double>();
+            c2.put("bar", 4.0);
+            c2.put("wee", 2.0);
+            c2.put("zak", 1.1);
+            WordVector v2 = new WordVector(c2);
+
+            System.out.println(String.format("%f", WordVector.scalarProduct(v1, v2)));
+            System.exit(0);
+
             Date begin = new Date();
 
             // Load database
