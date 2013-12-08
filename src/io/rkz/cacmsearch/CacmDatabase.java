@@ -146,26 +146,28 @@ public class CacmDatabase
         HashMap<String, HashMap<Integer, Integer>> reverseIndex =  new HashMap<String, HashMap<Integer, Integer>>();
 
         for (Document d : documents) {
-            // Push the document's word frequencies to the index
+            // Add the word frequencies to the index
             HashMap<String, Integer> freq = d.getWordFrequencies();
-            index.put(d.getId(), d.getWordFrequencies());
+            index.put(d.getId(), freq);
 
             // Add the words to the reverse index
             for (String word : freq.keySet()) {
                 Integer frequency = freq.get(word);
 
                 // If necessary, add the word to the global index
-                if (!reverseIndex.containsKey(word))
+                if (!reverseIndex.containsKey(word)) {
                     reverseIndex.put(word, new HashMap<Integer, Integer>());
+                }
 
                 // Update or insert the document's word frequency
                 HashMap<Integer, Integer> wordFrequencies = reverseIndex.get(word);
-                if (wordFrequencies.containsKey(d.getId()))
+                if (wordFrequencies.containsKey(d.getId())) {
                     wordFrequencies.put(d.getId(), wordFrequencies.get(d.getId()) + 1);
-                else
+                }
+                else {
                     wordFrequencies.put(d.getId(), 1);
+                }
             }
-
         }
 
         return new CacmIndex(index, reverseIndex);

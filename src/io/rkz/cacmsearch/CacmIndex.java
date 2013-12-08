@@ -7,8 +7,8 @@ import java.util.HashMap;
  * Pair of index lists of a CACM database.
  *
  * A CacmIndex contains:
- *  - an index: document id -> map of (word, frequency) in the document
- *  - a reverse index: word -> map of (document, frequency) in the database
+ *  - an index: docID -> map(word, frequency) in the document
+ *  - a reverse index: word -> map(docID, frequency) in the database
  */
 public class CacmIndex
 {
