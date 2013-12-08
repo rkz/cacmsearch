@@ -1,8 +1,6 @@
 package io.rkz.cacmsearch;
 
-import java.util.Date;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class Main
 {
@@ -22,7 +20,7 @@ public class Main
 
         }
         catch (IOException e) {
-            System.err.println("Error while loading the CACM database, aborting.");
+            System.err.println(String.format("I/O error: %s", e.getMessage()));
         }
     }
 }
