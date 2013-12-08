@@ -16,7 +16,7 @@ public class Main
             // Generate indexes
             CacmIndex idx = db.getIndex();
             System.out.println(String.format("Generated indexes (reverse index size: %d words).",
-                    idx.getReverseIndex().size()));
+                    idx.getTermIndex().size()));
 
         }
         catch (IOException e) {
