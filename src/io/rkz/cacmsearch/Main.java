@@ -1,6 +1,7 @@
 package io.rkz.cacmsearch;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main
 {
@@ -17,6 +18,21 @@ public class Main
             CacmIndex idx = db.getIndex();
             System.out.println(String.format("Generated indexes (reverse index size: %d words).",
                     idx.getTermIndex().size()));
+
+            // Run a query
+            WordVector q = new WordVector();
+            q.put("binary", 1.0);
+            q.put("algorithm", 1.0);
+            q.put("simulation", 1.0);
+            ArrayList<SearchMatch> results = (new VectorSearchEngine(idx)).search(q);
+
+            System.out.println(String.format("%d results", results.size()));
+            for (int i = 0; i < Math.min(results.size(), 10); i++) {
+                int docID = results.get(i).getDocumentID();
+                System.out.println(String.format("    %d (relevance=%.2f)",
+                        docID,
+                        results.get(i).getScore()));
+            }
 
         }
         catch (IOException e) {
