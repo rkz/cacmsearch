@@ -1,6 +1,7 @@
 package io.rkz.cacmsearch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -50,5 +51,26 @@ public class VectorSearchEngine
         Collections.reverse(matches);
 
         return matches;
+    }
+
+    /**
+     * Perform a search from a natural language query.
+     *
+     * @param query natural language query (e.g. "hello world" for "hello" and "world" with weights 1)
+     */
+    public ArrayList<SearchMatch> search(String query)
+    {
+        ArrayList<String> words = new ArrayList(Arrays.asList(query.trim()
+                .toLowerCase()
+                .replaceAll("[^a-z]", " ")  // replace all non-letters by a space
+                .replaceAll("( )+", " ")   // shrink consecutive spaces to 1 space
+                .split(" ")));
+
+        WordVector v = new WordVector();
+        for (String word : words) {
+            v.put(word, v.get(word) + 1.0);
+        }
+
+        return search(v);
     }
 }

@@ -20,12 +20,10 @@ public class Main
                     idx.getTermIndex().size()));
 
             // Run a query
-            WordVector q = new WordVector();
-            q.put("binary", 1.0);
-            q.put("algorithm", 1.0);
-            q.put("simulation", 1.0);
-            ArrayList<SearchMatch> results = (new VectorSearchEngine(idx)).search(q);
+            VectorSearchEngine engine = new VectorSearchEngine(idx);
+            ArrayList<SearchMatch> results = engine.search("binary algorithm simulation");
 
+            // Print the results
             System.out.println(String.format("%d results", results.size()));
             for (int i = 0; i < Math.min(results.size(), 10); i++) {
                 int docID = results.get(i).getDocumentID();
