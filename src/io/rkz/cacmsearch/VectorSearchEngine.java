@@ -1,24 +1,21 @@
 package io.rkz.cacmsearch;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Performs vectorial searches over a CacmIndex.
+ * Performs vectorial searches over a {@link CacmDatabase}.
  */
 public class VectorSearchEngine
 {
-    private CacmIndex index;
+    private CacmDatabase database;
 
     /**
      * Construct a VectorSearchEngine over a given index.
      * @param index
      */
-    public VectorSearchEngine(CacmIndex index)
+    public VectorSearchEngine(CacmDatabase database)
     {
-        this.index = index;
+        this.database = database;
     }
 
     /**
@@ -40,9 +37,9 @@ public class VectorSearchEngine
         ArrayList<SearchMatch> matches = new ArrayList<SearchMatch>();
 
         // Compute and keep matches with a non-null relevance
-        Set<Integer> docIDs = index.getDocumentIndex().keySet();
+        Set<Integer> docIDs = database.getDocumentIndex().keySet();
         for (int docID : docIDs) {
-            SearchMatch match = new SearchMatch(docID, WordVector.cos(index.getDocumentWordVector(docID), query));
+            SearchMatch match = new SearchMatch(docID, WordVector.cos(database.getDocumentWordVector(docID), query));
             if (match.getScore() != 0) matches.add(match);
         }
 
@@ -60,11 +57,11 @@ public class VectorSearchEngine
      */
     public ArrayList<SearchMatch> search(String query)
     {
-        ArrayList<String> words = new ArrayList(Arrays.asList(query.trim()
-                .toLowerCase()
-                .replaceAll("[^a-z]", " ")  // replace all non-letters by a space
-                .replaceAll("( )+", " ")   // shrink consecutive spaces to 1 space
-                .split(" ")));
+        List<String> words = Arrays.asList(query.trim()
+            .toLowerCase()
+            .replaceAll("[^a-z]", " ")  // replace all non-letters by a space
+            .replaceAll("( )+", " ")   // shrink consecutive spaces to 1 space
+            .split(" "));
 
         WordVector v = new WordVector();
         for (String word : words) {

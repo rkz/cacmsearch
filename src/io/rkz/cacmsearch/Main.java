@@ -2,6 +2,7 @@ package io.rkz.cacmsearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Main
 {
@@ -9,18 +10,17 @@ public class Main
     {
         try {
             // Load database
+            Date begin = new Date();
             CacmDatabase db = new CacmDatabase("cacm-2/cacm.all", "cacm-2/common_words");
-            System.out.println(String.format("CACM database loaded: %d documents, %d stop-words.",
-                    db.getDocuments().size(),
-                    db.getStopList().size()));
+            Date end = new Date();
 
-            // Generate indexes
-            CacmIndex idx = db.getIndex();
-            System.out.println(String.format("Generated indexes (reverse index size: %d words).",
-                    idx.getTermIndex().size()));
+            System.out.println(String.format("CACM database loaded: %d documents, %d stop-words in %.2f s.",
+                    db.getDocuments().size(),
+                    db.getStopList().size(),
+                    (end.getTime() - begin.getTime() + 0.0) / 1000));
 
             // Run a query
-            VectorSearchEngine engine = new VectorSearchEngine(idx);
+            VectorSearchEngine engine = new VectorSearchEngine(db);
             ArrayList<SearchMatch> results = engine.search("binary algorithm simulation");
 
             // Print the results

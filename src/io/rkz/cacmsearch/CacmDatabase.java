@@ -16,9 +16,11 @@ public class CacmDatabase
 {
     private ArrayList<String> stopList;
     private ArrayList<Document> documents;
+    private HashMap<Integer, HashMap<String, Integer>> documentIndex;
+    private HashMap<String, HashMap<Integer, Integer>> termIndex;
 
     /**
-     * Construct a CacmDatabase by parsing a CACM data file.
+     * Construct a CacmDatabase by parsing a CACM data file, and build the indexes.
      *
      * @param cacmFileName path to the CACM file
      * @param stopListFileName path to a file containing stopwords (one word per line), or null to use no stop-list
@@ -38,6 +40,10 @@ public class CacmDatabase
 
         // Load documents
         parseFile(cacmFileName);
+
+        // Build indexes
+        buildDocumentIndex();
+        buildTermIndex();
     }
 
     /**
@@ -54,6 +60,43 @@ public class CacmDatabase
      */
     public ArrayList<Document> getDocuments() {
         return documents;
+    }
+
+    /**
+     * Returns the document index.
+     *
+     * @return a <code>HashMap</code> where each document IDs is mapped to a <code>HashMap</code> of the term frequencies
+     *      within the document.
+     */
+    public HashMap<Integer, HashMap<String, Integer>> getDocumentIndex() {
+        return documentIndex;
+    }
+
+    /**
+     * Returns the term index.
+     *
+     * @return a <code>HashMap</code> where each term is mapped to a <code>HashMap</code> of the term frequencies in
+     *      the documents (each document being identified by its document ID in the inner HashMap).
+     */
+    public HashMap<String, HashMap<Integer, Integer>> getTermIndex() {
+        return termIndex;
+    }
+
+    /**
+     * Returns the {@link WordVector} corresponding to a document. Each coordinate is the number of occurences of the
+     * word in the document.
+     */
+    public WordVector getDocumentWordVector(int docID)
+    {
+        if (!documentIndex.containsKey(docID)) return null;
+
+        HashMap<String, Integer> docMap = documentIndex.get(docID);
+        WordVector vector = new WordVector();
+        for (String term : docMap.keySet()) {
+            vector.put(term, docMap.get(term) + 0.0);
+        }
+
+        return vector;
     }
 
     /**
@@ -138,38 +181,49 @@ public class CacmDatabase
     }
 
     /**
-     * Builds and returns the corresponding CacmIndex.
+     * Builds the document index.
      */
-    public CacmIndex getIndex()
+    private void buildDocumentIndex()
     {
-        HashMap<Integer, HashMap<String, Integer>> index = new HashMap<Integer, HashMap<String, Integer>>();
-        HashMap<String, HashMap<Integer, Integer>> reverseIndex =  new HashMap<String, HashMap<Integer, Integer>>();
+        documentIndex = new HashMap<Integer, HashMap<String, Integer>>();
 
-        for (Document d : documents) {
-            // Add the word frequencies to the index
+        for (Document d : documents)
+        {
             HashMap<String, Integer> freq = d.getWordFrequencies();
-            index.put(d.getId(), freq);
+            documentIndex.put(d.getId(), freq);
+        }
+    }
+
+    /**
+     * Builds the term index.
+     */
+    private void buildTermIndex()
+    {
+        termIndex = new HashMap<String, HashMap<Integer, Integer>>();
+
+        for (Document d : documents)
+        {
+            int docID = d.getId();
+            HashMap<String, Integer> freq = d.getWordFrequencies();
 
             // Add the words to the reverse index
-            for (String word : freq.keySet()) {
-                Integer frequency = freq.get(word);
+            for (String term : freq.keySet()) {
+                Integer frequency = freq.get(term);
 
                 // If necessary, add the word to the global index
-                if (!reverseIndex.containsKey(word)) {
-                    reverseIndex.put(word, new HashMap<Integer, Integer>());
+                if (!termIndex.containsKey(term)) {
+                        termIndex.put(term, new HashMap<Integer, Integer>());
                 }
 
                 // Update or insert the document's word frequency
-                HashMap<Integer, Integer> wordFrequencies = reverseIndex.get(word);
-                if (wordFrequencies.containsKey(d.getId())) {
-                    wordFrequencies.put(d.getId(), wordFrequencies.get(d.getId()) + 1);
+                HashMap<Integer, Integer> termFrequencies = termIndex.get(term);
+                if (termFrequencies.containsKey(docID)) {
+                        termFrequencies.put(docID, termFrequencies.get(docID) + frequency);
                 }
                 else {
-                    wordFrequencies.put(d.getId(), 1);
+                    termFrequencies.put(docID, frequency);
                 }
             }
         }
-
-        return new CacmIndex(index, reverseIndex);
     }
 }
