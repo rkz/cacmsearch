@@ -108,7 +108,7 @@ public class CacmDatabase
     private void loadStopList(String stopListFile) throws IOException
     {
         BufferedReader br = new BufferedReader(new FileReader(stopListFile));
-        String currentLine = "";
+        String currentLine;
         while ((currentLine = br.readLine()) != null) {
             stopList.add(currentLine.trim().toLowerCase());
         }
@@ -125,7 +125,7 @@ public class CacmDatabase
         documents = new ArrayList<Document>();
 
         BufferedReader br = new BufferedReader(new FileReader(cacmFileName));
-        String currentLine = "";
+        String currentLine;
         Document currentDoc = null;
         boolean reading = false;
 
@@ -150,6 +150,7 @@ public class CacmDatabase
 
             // Not a field mark: buffer content if reading is turned on
             else if (reading) {
+                //noinspection ConstantConditions
                 currentDoc.addWords(tokenizeAndFilter(currentLine));
             }
         }

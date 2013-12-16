@@ -2,7 +2,6 @@ package io.rkz.cacmsearch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Performs boolean searches over a {@link CacmDatabase}.
@@ -42,35 +41,35 @@ public class BooleanSearchEngine
     }
 
     /**
- * Transform a string into an {@link ArrayList} of tokens.
- */
-public static ArrayList<String> tokenize(String input)
-{
-    ArrayList<String> result = new ArrayList<String>();
+     * Transform a string into an {@link ArrayList} of tokens.
+     */
+    public static ArrayList<String> tokenize(String input)
+    {
+        ArrayList<String> result = new ArrayList<String>();
 
-    int currentCategory = -1;
+        int currentCategory = -1;
 
-    for (int i = 0; i < input.length(); i++) {
-        char ch = input.charAt(i);
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
 
-        // Category change: initiate a new token
-        if (getTokenCategory(ch) != currentCategory) {
-            currentCategory = getTokenCategory(ch);
-            result.add("");
+            // Category change: initiate a new token
+            if (getTokenCategory(ch) != currentCategory) {
+                currentCategory = getTokenCategory(ch);
+                result.add("");
+            }
+
+            // Append the character to the current (i.e. last) token
+            result.set(result.size()-1, result.get(result.size() - 1) + ch);
         }
 
-        // Append the character to the current (i.e. last) token
-        result.set(result.size()-1, result.get(result.size() - 1) + ch);
-    }
+        // Ignore tokens containing only spaces
+        ArrayList<String> resultNoSpaces = new ArrayList<String>();
+        for (int i = 0; i < result.size(); i++) {
+            if (result.get(i).replaceAll(" ", "").length() > 0) resultNoSpaces.add(result.get(i));
+        }
 
-    // Ignore tokens containing only spaces
-    ArrayList<String> resultNoSpaces = new ArrayList<String>();
-    for (int i = 0; i < result.size(); i++) {
-        if (result.get(i).replaceAll(" ", "").length() > 0) resultNoSpaces.add(result.get(i));
+        return resultNoSpaces;
     }
-
-    return resultNoSpaces;
-}
 
     /**
      * Helper for {@link BooleanSearchEngine#tokenize}. Determines to which category a token belongs.
@@ -112,7 +111,7 @@ public static ArrayList<String> tokenize(String input)
         for (int i = 0; i < tokens.size(); i++)
         {
             String token = tokens.get(i);
-            if (token == "(") {
+            if (token.equals("(")) {
                 level++;
                 if (level == 1) {  // opening a new first-level group
                     currentGroup.clear();
@@ -121,7 +120,7 @@ public static ArrayList<String> tokenize(String input)
                     currentGroup.add("(");
                 }
             }
-            else if (token == ")") {
+            else if (token.equals(")")) {
                 level--;
                 if (level == 0) {  // closing a first-level group
                     firstLevelGroups.add(currentGroup);
@@ -170,7 +169,7 @@ public static ArrayList<String> tokenize(String input)
         // 2 first-level groups: "!X"
         else if (firstLevelGroups.size() == 2) {
             // First group must be a "!"
-            if (firstLevelGroups.get(0).size() > 1 || firstLevelGroups.get(0).get(0) != "!") {
+            if (firstLevelGroups.get(0).size() > 1 || !firstLevelGroups.get(0).get(0).equals("!")) {
                 throw new BooleanSyntaxError();
             }
             return new BooleanNot(parseTokenList(firstLevelGroups.get(1)));
@@ -185,10 +184,10 @@ public static ArrayList<String> tokenize(String input)
 
             String centralToken = firstLevelGroups.get(1).get(0);
 
-            if (centralToken == "&") {
+            if (centralToken.equals("&")) {
                 return new BooleanAnd(parseTokenList(firstLevelGroups.get(0)), parseTokenList(firstLevelGroups.get(2)));
             }
-            else if (centralToken == "|") {
+            else if (centralToken.equals("|")) {
                 return new BooleanOr(parseTokenList(firstLevelGroups.get(0)), parseTokenList(firstLevelGroups.get(2)));
             }
             else {
