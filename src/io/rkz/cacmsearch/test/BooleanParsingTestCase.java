@@ -1,8 +1,9 @@
 package io.rkz.cacmsearch.test;
 
-import io.rkz.cacmsearch.BooleanSearchEngine;
+import io.rkz.cacmsearch.*;
 import junit.framework.TestCase;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BooleanParsingTestCase extends TestCase
 {
@@ -18,5 +19,40 @@ public class BooleanParsingTestCase extends TestCase
         assertEquals(tokens.get(5), "!");
         assertEquals(tokens.get(6), "people");
         assertEquals(tokens.get(7), ")");
+    }
+
+    public void testParse()
+    {
+        ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(
+                "hello", "&", "(", "(", "!", "world", ")", "|", "people", ")"
+        ));
+
+        try {
+            BooleanExpression expr = BooleanSearchEngine.parseTokenList(tokens);
+
+            BooleanAnd andExpr = (BooleanAnd)expr;
+
+            // check that the first operand is Term("hello")
+            BooleanTerm helloTerm = (BooleanTerm)andExpr.getFirst();
+            assert(helloTerm.getTerm() == "hello");
+
+            // check that the second operand is Or(Not(Term("world")), Term("people"))
+            BooleanOr orExpr = (BooleanOr)andExpr.getSecond();
+
+            // or's first operand
+            BooleanNot notTerm = (BooleanNot)orExpr.getFirst();
+            BooleanTerm notInnerTerm = (BooleanTerm)notTerm.getArgument();
+            assert(notInnerTerm.getTerm() == "world");
+
+            // or's second operand
+            BooleanTerm peopleTerm = (BooleanTerm)orExpr.getSecond();
+            assert(peopleTerm.getTerm() == "people");
+        }
+        catch (BooleanSyntaxError e) {
+            assert(false);
+        }
+        catch (ClassCastException e) {
+            assert(false);
+        }
     }
 }
