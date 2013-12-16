@@ -12,6 +12,10 @@ public class BooleanNot implements BooleanExpression
         this.argument = argument;
     }
 
+    public BooleanExpression getArgument() {
+        return argument;
+    }
+
     public boolean eval(WordVector vector)
     {
         return !argument.eval(vector);

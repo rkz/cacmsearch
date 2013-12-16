@@ -12,6 +12,10 @@ public class BooleanTerm implements BooleanExpression
         this.term = term;
     }
 
+    public String getTerm() {
+        return term;
+    }
+
     public boolean eval(WordVector vector)
     {
         return vector.get(term) > 0.0;

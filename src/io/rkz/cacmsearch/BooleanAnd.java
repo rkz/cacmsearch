@@ -14,6 +14,14 @@ public class BooleanAnd implements BooleanExpression
         this.second = second;
     }
 
+    public BooleanExpression getFirst() {
+        return first;
+    }
+
+    public BooleanExpression getSecond() {
+        return second;
+    }
+
     public boolean eval(WordVector vector)
     {
         return first.eval(vector) && second.eval(vector);
