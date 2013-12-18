@@ -20,8 +20,8 @@ public class Main
                     (end.getTime() - begin.getTime() + 0.0) / 1000));
 
             // Run a query
-            VectorSearchEngine engine = new VectorSearchEngine(db);
-            ArrayList<SearchMatch> results = engine.search("binary algorithm simulation");
+            BooleanSearchEngine engine = new BooleanSearchEngine(db);
+            ArrayList<SearchMatch> results = engine.search("binary & (algorithm & (simulation | heuristic) )");
 
             // Print the results
             System.out.println(String.format("%d results", results.size()));
@@ -31,10 +31,12 @@ public class Main
                         docID,
                         results.get(i).getScore()));
             }
-
         }
         catch (IOException e) {
             System.err.println(String.format("I/O error: %s", e.getMessage()));
+        }
+        catch (BooleanSyntaxError e) {
+            System.err.println("Syntax error in boolean expression.");
         }
     }
 }

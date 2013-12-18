@@ -20,24 +20,32 @@ public class BooleanSearchEngine
      * @param query expression against which to check the database's documents.
      * @return
      */
-    public ArrayList<SearchMatch> search(BooleanExpression query)
+    public ArrayList<SearchMatch> search(BooleanExpression expr)
     {
-        return new ArrayList<SearchMatch>();
+        // Filter matching documents
+        ArrayList<SearchMatch> matches = new ArrayList<SearchMatch>();
+        for (int docID : database.getDocumentIndex().keySet()) {
+            if (expr.eval(database.getDocumentWordVector(docID))) {
+                matches.add(new SearchMatch(docID, 1.0));
+            }
+        }
+
+        return matches;
     }
 
     /**
      * Natural language search.
      */
-    public ArrayList<SearchMatch> search(String query)
+    public ArrayList<SearchMatch> search(String query) throws BooleanSyntaxError
     {
         // Clean query
         query = query.toLowerCase()
-                .replaceAll("^[a-z\\(\\)&\\|! ]", "");  // remove illegal characters
+                .replaceAll("[^a-z\\(\\)&\\|! ]", "");  // remove illegal characters
 
-        // Tokenize
+        // Transform into a boolean expression
+        BooleanExpression expr = parseTokenList(tokenize(query));
 
-
-        return new ArrayList<SearchMatch>();
+        return search(expr);
     }
 
     /**
@@ -175,7 +183,7 @@ public class BooleanSearchEngine
             return new BooleanNot(parseTokenList(firstLevelGroups.get(1)));
         }
 
-        // 3 first-leve groups: "X & Y" or "X | Y"
+        // 3 first-level groups: "X & Y" or "X | Y"
         else if (firstLevelGroups.size() == 3) {
             // Central group must be a single token
             if (firstLevelGroups.get(1).size() > 1) {
