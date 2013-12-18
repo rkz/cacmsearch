@@ -35,6 +35,8 @@ public class BooleanExpressionTestCase extends TestCase
         BooleanExpression e = new BooleanTerm("foo");
 
         assertTrue(e.eval(foo));
+        assertTrue(e.eval(foo_bar));
+        assertTrue(e.eval(foo_wee));
         assertFalse(e.eval(bar));
     }
 
@@ -43,6 +45,7 @@ public class BooleanExpressionTestCase extends TestCase
         BooleanExpression e = new BooleanNot(new BooleanTerm("foo"));
 
         assertFalse(e.eval(foo));
+        assertFalse(e.eval(foo_bar));
         assertTrue(e.eval(bar));
     }
 

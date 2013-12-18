@@ -21,7 +21,22 @@ public class BooleanParsingTestCase extends TestCase
         assertEquals(tokens.get(7), ")");
     }
 
-    public void testParse()
+    public void testParseSingleTerm()
+    {
+        try {
+            BooleanExpression expr = BooleanSearchEngine.parseTokenList(BooleanSearchEngine.tokenize("hello"));
+            BooleanTerm termExpr = (BooleanTerm)expr;
+            assertEquals(termExpr.getTerm(), "hello");
+        }
+        catch (BooleanSyntaxError e) {
+            assert(false);
+        }
+        catch (ClassCastException e) {
+            assert(false);
+        }
+    }
+
+    public void testParseComplex()
     {
         ArrayList<String> tokens = new ArrayList<String>(Arrays.asList(
                 "hello", "&", "(", "(", "!", "world", ")", "|", "people", ")"
